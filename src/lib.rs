@@ -40,7 +40,7 @@
 //! map_of_maps.insert(frozen_map, 7i32);
 //! ```
 //!
-//! ## Why is `frozenset` only 0.1.0?
+//! ## Why is `frozenset` only 0.1.1?
 //!
 //! `frozenset` is currently in a pre-release state. It is not yet considered
 //! stable, and I may add/change any functionality I do not yet consider
@@ -91,6 +91,13 @@ impl<T, S> Freeze for HashSet<T, S> {
 /// for an `&HashMap`.
 pub struct FrozenMap<K, V, S = RandomState> {
     map: HashMap<K, V, S>,
+}
+impl<K, V> FrozenMap<K, V, RandomState> {
+    /// Create a new empty `FrozenMap` with the default hasher.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
 }
 impl<K, V, S> Deref for FrozenMap<K, V, S> {
     type Target = HashMap<K, V, S>;
@@ -184,6 +191,15 @@ impl<K: Hash, V: Hash, S> Hash for FrozenMap<K, V, S> {
 /// for an `&HashSet`.
 pub struct FrozenSet<T, S = RandomState> {
     set: HashSet<T, S>,
+}
+impl<T> FrozenSet<T> {
+    /// Create a new empty `FrozenSet` with the default hasher.
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            set: HashSet::new(),
+        }
+    }
 }
 impl<T, S> Deref for FrozenSet<T, S> {
     type Target = HashSet<T, S>;
