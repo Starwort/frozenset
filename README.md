@@ -40,7 +40,7 @@ let mut map_of_maps = HashMap::new();
 map_of_maps.insert(frozen_map, 7i32);
 ```
 
-## Why is `frozenset` only 0.2.0?
+## Why is `frozenset` only 0.2.1?
 
 `frozenset` is currently in a pre-release state. It is not yet considered
 stable, and I may add/change any functionality I do not yet consider

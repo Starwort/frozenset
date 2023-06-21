@@ -40,7 +40,7 @@
 //! map_of_maps.insert(frozen_map, 7i32);
 //! ```
 //!
-//! ## Why is `frozenset` only 0.2.0?
+//! ## Why is `frozenset` only 0.2.1?
 //!
 //! `frozenset` is currently in a pre-release state. It is not yet considered
 //! stable, and I may add/change any functionality I do not yet consider
@@ -80,7 +80,6 @@ impl<T, S> Freeze for HashSet<T, S> {
     }
 }
 
-#[derive(Debug, Clone)]
 /// A `FrozenMap` is a wrapper around a [`HashMap`] that implements [`Hash`].
 ///
 /// It is a logic error to mutate any element of the map (via internal
@@ -89,6 +88,8 @@ impl<T, S> Freeze for HashSet<T, S> {
 /// For convenience, `FrozenMap` implements all of [`HashMap`]'s traits, and
 /// will [`Deref`] to [`HashMap`], so you can use it as a drop-in replacement
 /// for an `&HashMap`.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FrozenMap<K, V, S = RandomState> {
     map: HashMap<K, V, S>,
 }
@@ -186,7 +187,6 @@ impl<K: Hash, V: Hash, S> Hash for FrozenMap<K, V, S> {
     }
 }
 
-#[derive(Debug, Clone)]
 /// A `FrozenSet` is a wrapper around a [`HashSet`] that implements [`Hash`].
 ///
 /// It is a logic error to mutate any element of the set (via internal
@@ -195,6 +195,8 @@ impl<K: Hash, V: Hash, S> Hash for FrozenMap<K, V, S> {
 /// For convenience, `FrozenSet` implements all of [`HashSet`]'s traits, and
 /// will [`Deref`] to [`HashSet`], so you can use it as a drop-in replacement
 /// for an `&HashSet`.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FrozenSet<T, S = RandomState> {
     set: HashSet<T, S>,
 }
