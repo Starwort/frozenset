@@ -40,7 +40,7 @@
 //! map_of_maps.insert(frozen_map, 7i32);
 //! ```
 //!
-//! ## Why is `frozenset` only 0.2.1?
+//! ## Why is `frozenset` only 0.2.2?
 //!
 //! `frozenset` is currently in a pre-release state. It is not yet considered
 //! stable, and I may add/change any functionality I do not yet consider
@@ -89,7 +89,6 @@ impl<T, S> Freeze for HashSet<T, S> {
 /// will [`Deref`] to [`HashMap`], so you can use it as a drop-in replacement
 /// for an `&HashMap`.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FrozenMap<K, V, S = RandomState> {
     map: HashMap<K, V, S>,
 }
@@ -196,7 +195,6 @@ impl<K: Hash, V: Hash, S> Hash for FrozenMap<K, V, S> {
 /// will [`Deref`] to [`HashSet`], so you can use it as a drop-in replacement
 /// for an `&HashSet`.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FrozenSet<T, S = RandomState> {
     set: HashSet<T, S>,
 }
@@ -278,5 +276,48 @@ impl<T: Hash, S> Hash for FrozenSet<T, S> {
             overall_hash ^= hasher.finish();
         }
         overall_hash.hash(state);
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<K: serde::Serialize, V: serde::Serialize> serde::Serialize for FrozenMap<K, V> {
+    fn serialize<S: serde::Serializer>(
+        &self,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        self.map.serialize(serializer)
+    }
+}
+#[cfg(feature = "serde")]
+impl<'de, K: serde::Deserialize<'de> + Hash + Eq, V: serde::Deserialize<'de>>
+    serde::Deserialize<'de> for FrozenMap<K, V>
+{
+    fn deserialize<D: serde::Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Self, D::Error> {
+        Ok(Self {
+            map: HashMap::deserialize(deserializer)?,
+        })
+    }
+}
+#[cfg(feature = "serde")]
+impl<T: serde::Serialize> serde::Serialize for FrozenSet<T> {
+    fn serialize<S: serde::Serializer>(
+        &self,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        self.set.serialize(serializer)
+    }
+}
+#[cfg(feature = "serde")]
+impl<'de, T: serde::Deserialize<'de> + Hash + Eq> serde::Deserialize<'de>
+    for FrozenSet<T>
+{
+    fn deserialize<D: serde::Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Self, D::Error> {
+        Ok(Self {
+            set: HashSet::deserialize(deserializer)?,
+        })
     }
 }
